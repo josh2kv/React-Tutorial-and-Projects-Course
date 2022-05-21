@@ -10,7 +10,6 @@ import {
 } from '../actions';
 
 const products_reducer = (state, action) => {
-  console.log('🚀 ~ action', action);
   if (action.type === SIDEBAR_OPEN) {
     return { ...state, isSidebarOpen: true };
   }
