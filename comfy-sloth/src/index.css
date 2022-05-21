@@ -198,6 +198,7 @@ p {
   margin-right: auto;
 }
 .page-100 {
+  /* 10rem = nav 5rem + footer 5rem */
   min-height: calc(100vh - 10rem);
   padding: 5rem 0;
 }
