@@ -122,6 +122,7 @@ const Filters = () => {
               min={min_price}
               max={max_price}
               value={price}
+              step="100"
             />
           </div>
           <div className="form-control shipping">
