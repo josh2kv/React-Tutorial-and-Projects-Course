@@ -8,8 +8,16 @@ import {
   COUNT_CART_TOTALS,
 } from '../actions';
 
+// state.cart 초기값을 localStorage 값으로 함
+const getLocalStorage = () => {
+  let cart = localStorage.getItem('cart');
+  if (cart) {
+    return JSON.parse(cart);
+  } else return [];
+};
+
 const initialState = {
-  cart: [],
+  cart: getLocalStorage(),
   total_items: 0,
   total_amount: 0,
   shipping_fee: 534,
@@ -23,6 +31,15 @@ export const CartProvider = ({ children }) => {
   const addToCart = (id, color, amount, product) => {
     dispatch({ type: ADD_TO_CART, payload: { id, color, amount, product } });
   };
+
+  const removeItem = id => {};
+  const toggleAmount = (id, value) => {};
+  const clearCart = () => {};
+
+  // cart에 아이템이 변할 때마다 localStorage에 저장
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(state.cart));
+  }, [state.cart]);
 
   return (
     <CartContext.Provider value={{ ...state, addToCart }}>
