@@ -32,17 +32,28 @@ export const CartProvider = ({ children }) => {
     dispatch({ type: ADD_TO_CART, payload: { id, color, amount, product } });
   };
 
-  const removeItem = id => {};
-  const toggleAmount = (id, value) => {};
-  const clearCart = () => {};
+  const removeItem = id => {
+    dispatch({ type: REMOVE_CART_ITEM, payload: id });
+  };
 
-  // cart에 아이템이 변할 때마다 localStorage에 저장
+  const toggleAmount = (id, value) => {
+    dispatch({ type: TOGGLE_CART_ITEM_AMOUNT, payload: { id, value } });
+  };
+
+  const clearCart = () => {
+    dispatch({ type: CLEAR_CART });
+  };
+
+  // cart에 아이템이 변할 때마다 아이템 개수합과 아이템 가격합을 업데이트 & localStorage에 저장
   useEffect(() => {
+    dispatch({ type: COUNT_CART_TOTALS });
     localStorage.setItem('cart', JSON.stringify(state.cart));
   }, [state.cart]);
 
   return (
-    <CartContext.Provider value={{ ...state, addToCart }}>
+    <CartContext.Provider
+      value={{ ...state, addToCart, removeItem, toggleAmount, clearCart }}
+    >
       {children}
     </CartContext.Provider>
   );
