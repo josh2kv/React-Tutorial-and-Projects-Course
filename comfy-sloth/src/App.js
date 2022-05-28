@@ -1,6 +1,6 @@
-import React from 'react'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
-import { Navbar, Sidebar, Footer } from './components'
+import React from 'react';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { Navbar, Sidebar, Footer } from './components';
 import {
   Home,
   SingleProduct,
@@ -9,7 +9,8 @@ import {
   Error,
   About,
   Products,
-} from './pages'
+  PrivateRoute,
+} from './pages';
 
 function App() {
   return (
@@ -30,16 +31,16 @@ function App() {
           <Products />
         </Route>
         <Route path="/products/:id" children={<SingleProduct />} />
-        <Route path="/checkout">
+        <PrivateRoute exact path="/checkout">
           <Checkout />
-        </Route>
+        </PrivateRoute>
         <Route path="*">
           <Error />
         </Route>
       </Switch>
       <Footer />
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
