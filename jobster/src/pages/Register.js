@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { loginUser, registerUser } from '../features/user/userSlice'
 import { Logo, FormRow } from '../components'
@@ -16,6 +17,15 @@ const Register = () => {
   const [values, setValues] = useState(initialState)
   const { user, isLoading } = useSelector(store => store.user)
   const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (user) {
+      setTimeout(() => {
+        navigate('/')
+      }, 2000)
+    }
+  }, [user])
 
   const handleChange = e => {
     const name = e.target.name
@@ -31,7 +41,7 @@ const Register = () => {
       return
     }
     if (isMember) {
-      dispatch(loginUser({ email: email, password: password }))
+      dispatch(loginUser({ email, password }))
       return
     }
     dispatch(registerUser({ name, email, password }))
@@ -40,6 +50,7 @@ const Register = () => {
   const toggleMember = () => {
     setValues({ ...values, isMember: !values.isMember })
   }
+
   return (
     <Wrapper>
       <form className="form" onSubmit={onSubmit}>
@@ -66,7 +77,7 @@ const Register = () => {
           handleChange={handleChange}
         />
         <button type="submit" className="btn btn-block" disabled={isLoading}>
-          submit
+          {isLoading ? 'loading...' : 'submit'}
         </button>
         <p>
           {values.isMember ? 'Not a member yet?' : 'Already a member?'}
