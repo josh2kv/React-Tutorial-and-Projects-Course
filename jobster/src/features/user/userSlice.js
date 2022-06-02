@@ -37,6 +37,29 @@ export const loginUser = createAsyncThunk(
   },
 )
 
+export const updateUser = createAsyncThunk(
+  'user/updateUser',
+  async (user, thunkAPI) => {
+    try {
+      // Bearer: token type 중 하나
+      // headers의 authorization에 token type과 token을 담아 request
+      const res = await customFetch.patch('/auth/updateUser', user, {
+        headers: {
+          authorization: `Bearer ${thunkAPI.getState().user.user.token}`,
+        },
+      })
+      return res.data
+    } catch (error) {
+      if (error.response.status === 401) {
+        // 따로 logoutUser를 import 하지 않았는데 사용 가능!?
+        thunkAPI.dispatch(logoutUser())
+        return thunkAPI.rejectWithValue('Unauthorized! Logging Out...')
+      }
+      return thunkAPI.rejectWithValue(error.response.data.msg)
+    }
+  },
+)
+
 const userSlice = createSlice({
   name: 'user',
   initialState,
@@ -76,6 +99,20 @@ const userSlice = createSlice({
       toast.success(`Welcome back ${user.name}`)
     },
     [loginUser.rejected]: (state, { payload }) => {
+      state.isLoading = false
+      toast.error(payload)
+    },
+    [updateUser.pending]: state => {
+      state.isLoading = true
+    },
+    [updateUser.fulfilled]: (state, { payload }) => {
+      const { user } = payload
+      state.isLoading = false
+      state.user = user
+      addUserToLocalStorage(user)
+      toast.success(`User Updated!`)
+    },
+    [updateUser.rejected]: (state, { payload }) => {
       state.isLoading = false
       toast.error(payload)
     },
