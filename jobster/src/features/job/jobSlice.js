@@ -5,27 +5,7 @@ import customFetch from '../../utils/axios';
 import { getUserFromLocalStorage } from '../../utils/localStorage';
 // Slice 안에서는 useSelector를 쓰지 않고 reducers를 직접 import해서 씀
 import { logoutUser } from '../user/userSlice';
-
-export const createJob = createAsyncThunk(
-  'job/createJob',
-  async (job, thunkAPI) => {
-    try {
-      const res = await customFetch.post('/jobs', job, {
-        headers: {
-          authorization: `Bearer ${thunkAPI.getState().user.user.token}`,
-        },
-      });
-      thunkAPI.dispatch(clearValues());
-      return res.data;
-    } catch (error) {
-      if (error.response.status === 401) {
-        thunkAPI.dispatch(logoutUser());
-        return thunkAPI.rejectWithValue('Unauthorized: Logging Out...');
-      }
-      return thunkAPI.rejectWithValue(error.response.data.msg);
-    }
-  },
-);
+import { createJobThunk, deleteJobThunk, editJobThunk } from './jobThunk';
 
 const initialState = {
   isLoading: false,
@@ -40,6 +20,12 @@ const initialState = {
   editJobId: '',
 };
 
+export const createJob = createAsyncThunk('job/createJob', createJobThunk);
+
+export const editJob = createAsyncThunk('job/editJob', editJobThunk);
+
+export const deleteJob = createAsyncThunk('job/deleteJob', deleteJobThunk);
+
 const jobSlice = createSlice({
   name: 'job',
   initialState,
@@ -52,6 +38,9 @@ const jobSlice = createSlice({
         ...initialState,
         jobLocation: getUserFromLocalStorage()?.location || '',
       };
+    },
+    setEditJob: (state, { payload }) => {
+      return { ...state, isEditing: true, ...payload };
     },
   },
   extraReducers: {
@@ -66,8 +55,19 @@ const jobSlice = createSlice({
       state.isLoading = false;
       toast.error(payload);
     },
+    [editJob.pending]: state => {
+      state.isLoading = true;
+    },
+    [editJob.fulfilled]: state => {
+      state.isLoading = false;
+      toast.success('Job Modified!');
+    },
+    [editJob.rejected]: (state, { payload }) => {
+      state.isLoading = false;
+      toast.error(payload);
+    },
   },
 });
 
-export const { handleChange, clearValues } = jobSlice.actions;
+export const { handleChange, clearValues, setEditJob } = jobSlice.actions;
 export default jobSlice.reducer;
